@@ -1,0 +1,6 @@
+backbones: [audioldm2, musicgen, ace_step_1_5]
+strategies: [text_only, llm_profile, vanilla_rag, re_audioldm, upra]
+split: test
+duration_seconds: 10
+eta: 0.6
+same_seed_across_strategies: true
