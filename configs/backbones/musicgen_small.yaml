@@ -1,0 +1,10 @@
+# MusicGen publication configuration. Paths are relative to this file.
+name: musicgen
+model_id: facebook/musicgen-small
+model_path: ../../../external_models/checkpoints/musicgen-small
+sample_rate: 32000
+native_conditioning_dim: 1024
+duration_seconds: 10
+guidance_scale: 3.0
+do_sample: true
+seed: 2026

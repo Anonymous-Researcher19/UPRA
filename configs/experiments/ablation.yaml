@@ -1,0 +1,16 @@
+# Values correspond to Table 3. Select one variant per run.
+model_variants:
+  - full
+  - no_mpp
+  - no_ipd
+  - ipd_track
+  - no_psa
+retrieval_variants:
+  full: hir
+  no_hir: profile_only
+candidate_sources:
+  - both
+  - history_only
+  - external_only
+fixed_backbone: musicgen
+seeds: [2023]
