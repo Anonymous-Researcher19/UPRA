@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 
 from upra.backbones import PreferenceConditioningAdapter, total_objective
-from upra.config import load_config, resolve_path, with_overrides
+from upra.config import load_backbone_config, load_config, resolve_path, with_overrides
 from upra.data import FeatureDataset, collate_feature_records, move_batch
 from upra.model import UPRA
 from upra.protocols import FrozenBackboneProtocol
@@ -76,9 +76,16 @@ def _unwrap(module: nn.Module) -> nn.Module:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train UPRA with a frozen music-generation backbone")
     parser.add_argument("--config", default="configs/default.yaml")
+    parser.add_argument(
+        "--backbone-config", default=None,
+        help="Optional configs/backbones/*.yaml fragment overlaid on --config",
+    )
     parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE")
     args = parser.parse_args()
-    cfg = with_overrides(load_config(args.config), args.set)
+    cfg = load_config(args.config)
+    if args.backbone_config:
+        cfg = load_backbone_config(cfg, args.backbone_config)
+    cfg = with_overrides(cfg, args.set)
     device, rank, local_rank, world_size = _distributed_device(cfg)
     seed_everything(int(cfg["seed"]) + rank)
 

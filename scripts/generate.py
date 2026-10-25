@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from upra.backbones import PreferenceConditioningAdapter
-from upra.config import load_config, resolve_path
+from upra.config import load_backbone_config, load_config, resolve_path
 from upra.data import FeatureDataset, collate_feature_records, move_batch
 from upra.model import UPRA
 from upra.strategies import prepare_strategy
@@ -24,11 +24,17 @@ from upra.utils import seed_everything
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate paper-comparison audio with fixed seeds")
     parser.add_argument("--config", default="configs/default.yaml")
+    parser.add_argument(
+        "--backbone-config", default=None,
+        help="Optional configs/backbones/*.yaml fragment overlaid on --config",
+    )
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--strategy", required=True, choices=["text_only", "llm_profile", "vanilla_rag", "re_audioldm", "upra"])
     parser.add_argument("--split", default="test")
     args = parser.parse_args()
     cfg = load_config(args.config)
+    if args.backbone_config:
+        cfg = load_backbone_config(cfg, args.backbone_config)
     factory_path = cfg["backbone"].get("factory")
     if not factory_path:
         raise SystemExit("Missing backbone.factory (expected module:function in the config).")

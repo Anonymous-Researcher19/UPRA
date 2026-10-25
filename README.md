@@ -44,6 +44,21 @@ python scripts/verify_backbones.py
 python scripts/verify_backbones.py --hash
 ```
 
+The backbone files are fragments over the full experiment configuration. Select one without
+editing the default YAML:
+
+```bash
+python scripts/train.py --config configs/default.yaml \
+  --backbone-config configs/backbones/musicgen_small.yaml
+```
+
+Use `audioldm2_music.yaml` or `ace_step_1_5_xl_sft.yaml` for the other paper backbones.
+
+The upstream repositories are kept outside this submission tree. Before training or generation,
+set `backbone.factory` (for example with `--set backbone.factory=your_wrapper:create_backbone`) to
+the wrapper that exposes the `FrozenBackboneProtocol` in `upra/protocols.py`; the scripts fail fast
+if that external integration or the omitted data package is not present.
+
 ## Environment
 
 ```bash

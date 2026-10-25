@@ -17,6 +17,25 @@ def load_config(path: str | Path) -> dict[str, Any]:
     return cfg
 
 
+def load_backbone_config(base: dict[str, Any], path: str | Path) -> dict[str, Any]:
+    """Overlay one of ``configs/backbones/*.yaml`` on a full experiment config.
+
+    Backbone YAML files intentionally contain only model-specific settings.  Keeping
+    them as fragments avoids three subtly diverging copies of the optimizer/data
+    protocol while still making each published backbone selectable from the command
+    line.
+    """
+    path = Path(path).resolve()
+    with path.open("r", encoding="utf-8") as handle:
+        fragment = yaml.safe_load(handle) or {}
+    if not isinstance(fragment, dict):
+        raise TypeError(f"Backbone config must be a YAML mapping: {path}")
+    result = deepcopy(base)
+    result["backbone"] = {**result.get("backbone", {}), **fragment}
+    result["_backbone_config_path"] = str(path)
+    return result
+
+
 def resolve_path(cfg: dict[str, Any], value: str | Path) -> Path:
     value = Path(value)
     if value.is_absolute():
@@ -35,4 +54,3 @@ def with_overrides(cfg: dict[str, Any], overrides: list[str]) -> dict[str, Any]:
             cursor = cursor.setdefault(part, {})
         cursor[parts[-1]] = yaml.safe_load(raw)
     return result
-
